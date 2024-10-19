@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-zg65=nht@m*3-dnaf^q56+3w-!j8ko_gj@u%l%m^!f9$&8k3tt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['bookingsystem-mblf.onrender.com' ]
 
 
 # Application definition
