@@ -11,10 +11,15 @@ from django.db import models
 '''
 
 class Reserva(models.Model):
+    STATUS_CHOICES = [
+        ('c', 'Confirmada'),
+        ('e', 'Espera'),
+    ]
     name = models.CharField(max_length = 100, blank = False)
     phone = models.CharField(max_length = 14, blank = False)
     num_people = models.IntegerField(blank = False)
     datetime = models.DateTimeField(blank = False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default = 'espera')
     updated_by = models.CharField(max_length=50, blank=True, null=True)
     deleted_by = models.CharField(max_length=50, blank=True, null=True)
     created_by = models.CharField(max_length=50, blank=True, null=True)
@@ -38,3 +43,9 @@ class Table(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class BookedTable(models.Model):
+    booking = models.ForeignKey(Reserva, on_delete=models.CASCADE)
+    mesa = models.ForeignKey(Table, on_delete = models.CASCADE)
+    end_date = models.DateTimeField(null=True, blank=True)
