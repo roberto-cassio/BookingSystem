@@ -1,15 +1,4 @@
 from django.db import models
-
-'''class Administrator(models.Model):
-    nome = models.CharField(max_length = 100)
-    email = models.EmailField(blank = False)
-    password = models.CharField(max_length = 50)
-
-
-    def __str__(self):
-        return self.nome
-'''
-
 class Reserva(models.Model):
     STATUS_CHOICES = [
         ('c', 'Confirmada'),
