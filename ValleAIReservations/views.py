@@ -1,11 +1,8 @@
-from datetime import timedelta
-from django.utils import timezone
 from ValleAIReservations.models import Table, BookedTable, Reserva
 from ValleAIReservations.serializer import TableSerializer, ReservaSerializer, BookedTableSerializer
 from rest_framework import viewsets, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import BasePermission, IsAdminUser
-from rest_framework.response import Response
 
 
 class isAdminOrCreateOnly(BasePermission):
