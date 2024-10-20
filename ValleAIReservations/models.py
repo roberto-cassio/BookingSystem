@@ -38,4 +38,4 @@ class Table(models.Model):
 class BookedTable(models.Model):
     booking = models.ForeignKey(Reserva, on_delete=models.CASCADE)
     mesa = models.ForeignKey(Table, on_delete = models.CASCADE)
-    end_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.TimeField(null=True, blank=True)
