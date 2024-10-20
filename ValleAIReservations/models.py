@@ -9,6 +9,7 @@ class Reserva(models.Model):
     num_people = models.IntegerField(blank = False)
     datetime = models.DateTimeField(blank = False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default = 'espera')
+    waitlist_position = models.IntegerField(null=True, blank= True)
     updated_by = models.CharField(max_length=50, blank=True, null=True)
     deleted_by = models.CharField(max_length=50, blank=True, null=True)
     created_by = models.CharField(max_length=50, blank=True, null=True)
