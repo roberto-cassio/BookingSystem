@@ -1,8 +1,9 @@
 from ValleAIReservations.models import Table, BookedTable, Reserva
 from ValleAIReservations.serializer import TableSerializer, ReservaSerializer, BookedTableSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import BasePermission, IsAdminUser
+from rest_framework.response import Response
 
 
 class isAdminOrCreateOnly(BasePermission):
@@ -28,18 +29,24 @@ class ReservaViewSet(viewsets.ModelViewSet):
     serializer_class = ReservaSerializer
 
     def create(self, request, *args, **kwargs):
+        data = request.data.copy()
         booked_tables = BookedTable.objects.filter(end_date__isnull=True).count()
         total_tables = Table.objects.count()
 
         if booked_tables >= total_tables:
-            request.data['status'] = 'e'
+            data['status'] = 'e'
             wailist_count = Reserva.objects.filter(status='e').count()
-            request.data['waitlist_position'] = wailist_count + 1
+            data['waitlist_position'] = wailist_count + 1
         else:
-            request.data['status'] = 'c'
-            request.data['waitlist_position'] = None
- 
-        return super().create(request,*args,**kwargs)
+            data['status'] = 'c'
+            data['waitlist_position'] = None
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def move_from_waitlist(self):
         waitlist_next =  Reserva.objects.filter(status='e').order_by('waitlist_position').first()
