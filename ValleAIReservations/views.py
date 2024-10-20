@@ -36,6 +36,17 @@ class ReservaViewSet(viewsets.ModelViewSet):
         else:
             request.data['status'] = 'c'
         return super().create(request,*args,**kwargs)
+    
+    def update(self,request,*args,**kwargs):
+        booking = self.get_object()
+
+        if request.user.is_staff:
+            new_status = request.data.get('status')
+            if new_status in ['c', 'e']:
+                booking.status = new_status
+                booking.save()
+
+        return super().update(request,*args,**kwargs)
 
 class TableViewSet(viewsets.ModelViewSet):
     authentication_classes = [BasicAuthentication]
