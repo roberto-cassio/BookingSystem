@@ -14,6 +14,8 @@ class TableSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'size']
 
 class BookedTableSerializer(serializers.ModelSerializer):
+    booking_id = serializers.PrimaryKeyRelatedField(queryset=Reserva.objects.all(), source='booking')
+    mesa_id = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), source='mesa')
     class Meta:
         model = BookedTable
         fields = ['id', 'end_date','mesa_id', 'booking_id']
