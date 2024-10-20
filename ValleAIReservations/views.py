@@ -1,3 +1,4 @@
+from django.utils import timezone
 from ValleAIReservations.models import Table, BookedTable, Reserva
 from ValleAIReservations.serializer import TableSerializer, ReservaSerializer, BookedTableSerializer
 from rest_framework import viewsets, status
@@ -27,16 +28,23 @@ class ReservaViewSet(viewsets.ModelViewSet):
     permission_classes = [isAdminOrCreateOnly]
     queryset = Reserva.objects.all()
     serializer_class = ReservaSerializer
-
+    
+    def move_from_waitlist(self):
+        waitlist_next =  Reserva.objects.filter(status='e').order_by('waitlist_position').first()
+        if waitlist_next:
+            waitlist_next.status = 'c'
+            waitlist_next.waitlist_position = None
+            waitlist_next.save()
+    
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
-        booked_tables = BookedTable.objects.filter(end_date__isnull=True).count()
+        booked_tables = BookedTable.objects.filter(end_date__gt=timezone.now()).count() 
         total_tables = Table.objects.count()
-
+        
         if booked_tables >= total_tables:
             data['status'] = 'e'
-            wailist_count = Reserva.objects.filter(status='e').count()
-            data['waitlist_position'] = wailist_count + 1
+            waitlist_count = Reserva.objects.filter(status='e').count()
+            data['waitlist_position'] = waitlist_count + 1
         else:
             data['status'] = 'c'
             data['waitlist_position'] = None
@@ -45,15 +53,10 @@ class ReservaViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         
+        self.move_from_waitlist()
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    
-    def move_from_waitlist(self):
-        waitlist_next =  Reserva.objects.filter(status='e').order_by('waitlist_position').first()
-        if waitlist_next:
-            waitlist_next.status = 'c'
-            waitlist_next.waitlist_position = None
-            waitlist_next.save()
     
     def update(self,request,*args,**kwargs):
         booking = self.get_object()
@@ -63,6 +66,8 @@ class ReservaViewSet(viewsets.ModelViewSet):
             if new_status in ['c', 'e']:
                 booking.status = new_status
                 booking.save()
+
+        self.move_from_waitlist()
 
         return super().update(request,*args,**kwargs)
 
