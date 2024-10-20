@@ -5,7 +5,7 @@ from ValleAIReservations.models import Reserva, Table, BookedTable
 class ReservaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reserva
-        fields = ['id', 'name', 'phone', 'num_people', 'datetime']
+        fields = ['id', 'name', 'phone', 'num_people', 'datetime', 'status', 'waitlist_position']
 
 
 class TableSerializer(serializers.ModelSerializer):
