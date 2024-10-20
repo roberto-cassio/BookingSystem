@@ -1,14 +1,14 @@
 from django.db import models
 class Reserva(models.Model):
     STATUS_CHOICES = [
-        ('c', 'Confirmada'),
-        ('e', 'Espera'),
+        ('c', 'confirmada'),
+        ('e', 'espera'),
     ]
     name = models.CharField(max_length = 100, blank = False)
     phone = models.CharField(max_length = 14, blank = False)
     num_people = models.IntegerField(blank = False)
     datetime = models.DateTimeField(blank = False)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default = 'espera')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
     waitlist_position = models.IntegerField(null=True, blank= True)
     updated_by = models.CharField(max_length=50, blank=True, null=True)
     deleted_by = models.CharField(max_length=50, blank=True, null=True)
