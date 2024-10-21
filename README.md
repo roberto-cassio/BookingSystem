@@ -62,6 +62,9 @@ DATABASE_PORT = 'porta'
 O Django utiliza migrações para criar e modificar as tabelas do banco de dados. Para aplicar as migrações existentes, execute:
 python manage.py migrate
 
+## 6.5 Popular o Banco de Dados
+Caso seja necessário, rode o script Populate-Tables.sql para popular o Banco de Dados
+
 ## 7. Criar um Superusuário#
 Para acessar a interface administrativa do Django, crie um superusuário:
 
