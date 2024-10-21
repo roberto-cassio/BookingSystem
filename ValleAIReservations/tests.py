@@ -4,7 +4,7 @@ from ValleAIReservations.models import Reserva, BookedTable, Table
 from django.utils import timezone
 
 class ReservaTests(TestCase):
-
+#TestCase para o Waitlist quando as mesas estiverem vazias.
     @patch('ValleAIReservations.models.BookedTable.objects.filter')
     @patch('ValleAIReservations.models.Table.objects.count')
     def test_create_reserva_when_tables_are_full(self, mock_table_count, mock_booked_tables_filter):
@@ -32,7 +32,7 @@ class ReservaTests(TestCase):
             print("WaitList Count após a criação:", waitlist_count)
             print(f"Reserva criada (Mesas Ocupadas) {i + 1}:", response.data)
 
-
+#TestCase para o Waitlist caso as mesas estiverem cheias
     @patch('ValleAIReservations.models.BookedTable.objects.filter')
     @patch('ValleAIReservations.models.Table.objects.count')
     def test_create_reserva_when_tables_are_available(self, mock_table_count, mock_booked_tables_filter):
