@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import BasePermission, IsAdminUser
 
-
+#Permissão criada para liberar as requisições GET e POST para todos os Usuários, e os métodos PUT e DELETE, somente para Admin
 class isAdminOrCreateOnly(BasePermission):
     def has_permission(self, request, view):
         if request.method in ['GET', 'POST']:
@@ -13,7 +13,7 @@ class isAdminOrCreateOnly(BasePermission):
             return request.user and request.user.is_authenticated
         return request.user and request.user.is_authenticated and request.user.is_staff
 
-
+#Permissão criada para liberar somente a requisição de GET para usuários Gerais, enquanto as outras somente para Admin
 class isAdminOrReadOnly(BasePermission):
     def has_permission(self,request,view):
         if request.method == 'GET':
