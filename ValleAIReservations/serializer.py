@@ -9,7 +9,7 @@ class ReservaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reserva
         fields = ['id', 'name', 'phone', 'num_people', 'datetime','waitlist_position', 'status']
-    #Método para sobrescrever o método create do FrameWork e adicionar a lógica de WaitList na adição de Equipamentos
+    #Função para sobrescrever o método create do FrameWork e adicionar a lógica de WaitList na adição de Equipamentos
     def create(self, validated_data):
         #Verificação se no momento atual, quantas mesas constam como agendadas em relação a quantidade de mesas disponíveis.
         booked_tables = BookedTable.objects.filter(end_date__gt=timezone.now()).count()
@@ -28,8 +28,8 @@ class ReservaSerializer(serializers.ModelSerializer):
             validated_data['waitlist_position'] = None
 
         return super().create(validated_data)
-    
 
+    #Método para mover a primeira reserva da Waitlist para Confirmado retirando a Waitlist position do mesmo
     def move_from_waitlist(self, validated_data):
         waitlist_reservations = Reserva.objects.filter(status='e').order_by('waitlist_position')
         if waitlist_reservations.exists():
@@ -38,35 +38,40 @@ class ReservaSerializer(serializers.ModelSerializer):
             reservation_to_move.waitlist_position = None
             reservation_to_move.save()
             print(f"Moved reservation {reservation_to_move.id} from waitlist to confirmed.")
-
+            
+    #Função para sobrescrever o método update do Framework para adicionar a lógica da wait_list
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.num_people = validated_data.get('num_people', instance.num_people)
         instance.datetime = validated_data.get('datetime', instance.datetime)
 
-        booked_tables = BookedTable.objects.filter(end_date__gt=timezone.now() + timedelta(hours=1)).count()
+        booked_tables = BookedTable.objects.filter(end_date__gt=timezone.now()).count()
         total_tables = Table.objects.count()
-
+        
+        # Verifica se todas as mesas estão reservadas e se a reserva não está na lista de espera.
         if booked_tables >= total_tables and instance.status != 'e':
             print("All tables are booked, moving to waitlist")
             instance.status = 'e'
             waitlist_count = Reserva.objects.filter(status='e').count()
             instance.waitlist_position = waitlist_count + 1
+         # Se houver mesas disponíveis e a reserva estiver na lista de espera, ela é confirmada.
         elif booked_tables < total_tables and instance.status == 'e':
             print("There are available tables, confirming the reservation")
+            self.move_from_waitlist(validated_data)
             instance.status = 'c'
             instance.waitlist_position = None
         
         instance.save()
         return instance
-
+#Serializer das mesas
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Table
         fields = ['id', 'name', 'size']
-
+#Serializer das Mesas Agendadas
 class BookedTableSerializer(serializers.ModelSerializer):
+    #Serialização das chaves estrangeiras
     booking_id = serializers.PrimaryKeyRelatedField(queryset=Reserva.objects.all(), source='booking')
     mesa_id = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), source='mesa')
     class Meta:
