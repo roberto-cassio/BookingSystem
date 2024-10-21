@@ -5,18 +5,22 @@ from django.utils import timezone
 
 
 class ReservaSerializer(serializers.ModelSerializer):
+    #Definindo o modelo e os dados a serem serializados na Classe Meta
     class Meta:
         model = Reserva
         fields = ['id', 'name', 'phone', 'num_people', 'datetime','waitlist_position', 'status']
+    #Método para sobrescrever o método create do FrameWork e adicionar a lógica de WaitList na adição de Equipamentos
     def create(self, validated_data):
-        booked_tables = BookedTable.objects.filter(end_date__gt=timezone.now() + timedelta(hours=1)).count()
+        #Verificação se no momento atual, quantas mesas constam como agendadas em relação a quantidade de mesas disponíveis.
+        booked_tables = BookedTable.objects.filter(end_date__gt=timezone.now()).count()
         total_tables = Table.objects.count()
         print(f'Booked Tables: {booked_tables} e Total Tables: {total_tables}')
-
+        #Caso haja uma quantidade de mesas agendadas maior ou igual o de mesas totais, ele retorna como em espera, se não fica como confirmada.
         if booked_tables >= total_tables:
             print("All tables are booked, adding to the waitlist")
             waitlist_count = Reserva.objects.filter(status='e').count()
             validated_data['status'] = 'e'
+            #Aqui soma um na contagem da Waitlist caso adicione mais alguém na espera.
             validated_data['waitlist_position'] = waitlist_count + 1
         else:
             print("There are available tables, confirming the reservation")
