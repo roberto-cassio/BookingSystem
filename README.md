@@ -24,8 +24,7 @@ Substitua <URL_DO_REPOSITORIO> pelo link do repositório. Isso criará uma pasta
 Vá para o diretório do projeto:
 cd nome-do-repositorio
 
-## 3. Criar um Ambiente Virtual (Opcional, mas recomendado)
-Criar um ambiente virtual ajuda a manter as dependências do projeto isoladas de outras aplicações Python no seu sistema.
+## 3. Criar um Ambiente Virtual
 python -m venv venv
 
 Ative o ambiente virtual:
@@ -33,7 +32,7 @@ Windows:
 venv\Scripts\activate
 Linux/macOS:
 bash
-Copiar código
+
 source venv/bin/activate
 
 ## 4. Instalar as Dependências do Projeto
